@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse, os, shlex, subprocess, sys
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -13,6 +15,7 @@ def parseargs():    # handle user arguments
     parser.add_argument('--virus', action='store_true', help='Run BWA on viruses. This or --fungi required.')
     parser.add_argument('--output', default='alignments.sam', help='Where to output BWA results to.')
     parser.add_argument('--paired', action='store_true', help='Treat input reads file as interleaved paired end reads.')
+    parser.add_argument('--threads', default='24', help='Number of threads.')
     args = parser.parse_args()
     return args
 
@@ -30,9 +33,9 @@ def main():
     paired = '-p' if len(args.reads) == 1 and args.paired else ''
 
     if args.virus:
-        cmd = ' '.join([bwa_exec, 'mem', paired, '-a', virus_ind, args.reads])
+        cmd = ' '.join([bwa_exec, 'mem', paired, '-a', virus_ind, args.reads, '-t',args.threads])
     else:  # args.fungi
-        cmd = ' '.join([bwa_exec, 'mem', paired, '-a', fungi_ind, args.reads])
+        cmd = ' '.join([bwa_exec, 'mem', paired, '-a', fungi_ind, args.reads, '-t',args.threads])
     with(open(args.output, 'w')) as outfile:
         subprocess.call(shlex.split(cmd), stdout=outfile)
 
